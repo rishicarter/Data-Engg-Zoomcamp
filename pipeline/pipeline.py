@@ -1,0 +1,10 @@
+import sys
+import pandas as pd
+
+
+month = int(sys.argv[1])
+print(f"{month=}")
+print("Hello Pipe!")
+
+df = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
+print(f"{df.head()}")
