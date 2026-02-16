@@ -1,6 +1,7 @@
 import pandas as pd
 from sqlalchemy import create_engine
 import click
+from tqdm.auto import tqdm
 
 base_url = "https://github.com/DataTalksClub/nyc-tlc-data/releases/download/yellow/"
 filename = "yellow_tripdata_2019-01.csv.gz"
@@ -35,14 +36,14 @@ parse_dates = [
 @click.option('--pg-port', default=5432, type=int, help='PostgreSQL port')
 @click.option('--pg-db', default='ny_taxi', help='PostgreSQL database name')
 @click.option('--target-table', default='yellow_taxi_data', help='Target table name')
-def main(pg_user,pg_pass, pg_host, pg_port, pg_db, target_table):
+def run(pg_user,pg_pass, pg_host, pg_port, pg_db, target_table):
     print("Hello from data-engg-zoomcamp!")
     engine = create_engine(f'postgresql://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}')
-    df_iter = pd.read_csv(f"{base_url}+{filename}", dtype=dtypes, parse_dates=parse_dates, iterator=True, chunksize=10000)
+    df_iter = pd.read_csv(base_url+filename, dtype=dtypes, parse_dates=parse_dates, iterator=True, chunksize=10000)
 
     first = True
 
-    for df_chunk in df_iter:
+    for df_chunk in tqdm(df_iter):
 
         if first:
             # Create table schema (no data)
@@ -61,8 +62,8 @@ def main(pg_user,pg_pass, pg_host, pg_port, pg_db, target_table):
             if_exists="append"
         )
 
-        print("Inserted:", len(df_chunk))
+        # print("Inserted:", len(df_chunk))
 
 
 if __name__ == "__main__":
-    main()
+    run()
